@@ -1,4 +1,4 @@
-## Adafruit Unified Gyro Driver for L3GD20 Gyroscopes ##
+## Adafruit Unified L3GD20 Driver ##
 
 This unified sensor driver is for use with the Adafruit Triple-Axis Gyro sensor and the Adafruit 10DOF Breakout, and has been designed specifically for these boards:
 
