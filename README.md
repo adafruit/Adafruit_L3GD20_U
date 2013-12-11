@@ -1,6 +1,6 @@
 ## Adafruit Unified L3GD20 Driver ##
 
-This unified sensor driver is for use with the Adafruit Triple-Axis Gyro sensor and the Adafruit 10DOF Breakout, and has been designed specifically for these boards:
+This unified sensor driver is for use with any STM Triple-Axis Gyro that is register compatible with the L3GD20, including the L3G4200D and others.  It has been tested on the Adafruit Triple-Axis Gyro sensor and the Adafruit 10DOF Breakout, and has been designed specifically for these boards:
 
   ----> https://www.adafruit.com/products/1032
   ----> http://www.adafruit.com/products/1604
@@ -35,3 +35,13 @@ BSD license, all text above must be included in any redistribution
 To download. click the **Download ZIP** in the right-hand column, rename the uncompressed folder Adafruit\_L3GD20\_U. Check that the Adafruit\_L3GD20\_U folder contains Adafruit\_L3GD20\U.cpp and Adafruit\_L3GD20\_U.h
 
 Place the Adafruit\_L3GD20\_U library folder your (arduinosketchfolder)/libraries/ folder. You may need to create the libraries subfolder if its your first library. Restart the IDE.
+
+## Adding support for other models ##
+Author: therealmitchconnors
+12/11/2013
+
+When constructed with no parameters, this driver interacts with the L3GD20 via I2C.  To use with the L3G4200D, simply construct as follows:
+
+```Adafruit_L3GD20_Unified gyro = Adafruit_L3GD20_Unified(20, L3G4200D_type);```
+
+To implement support for other register compatible gyros (perhaps the L3G3200D), simply initialize a ```gyro_type``` struct with the appropriate register addresses and device specific values, and pass that to the ```Adafruit_L3GD20_Unified``` constructor in place of the ```L3G4200D_type``` constant.  See [Adafruit_L3GD20_U.h](Adafruit_L3GD20_U.h) for an example.
