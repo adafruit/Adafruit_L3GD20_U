@@ -36,7 +36,7 @@
 /**************************************************************************/
 void Adafruit_L3GD20_Unified::write8(byte reg, byte value)
 {
-  Wire.beginTransmission(L3GD20_ADDRESS);
+  Wire.beginTransmission(this->type.I2CAddress);
   #if ARDUINO >= 100
     Wire.write((uint8_t)reg);
     Wire.write((uint8_t)value);
@@ -56,14 +56,14 @@ byte Adafruit_L3GD20_Unified::read8(byte reg)
 {
   byte value;
 
-  Wire.beginTransmission((byte)L3GD20_ADDRESS);
+  Wire.beginTransmission((byte)this->type.I2CAddress);
   #if ARDUINO >= 100
     Wire.write((uint8_t)reg);
   #else
     Wire.send(reg);
   #endif
   Wire.endTransmission();
-  Wire.requestFrom((byte)L3GD20_ADDRESS, (byte)1);
+  Wire.requestFrom((byte)this->type.I2CAddress, (byte)1);
   #if ARDUINO >= 100
     value = Wire.read();
   #else
@@ -83,8 +83,9 @@ byte Adafruit_L3GD20_Unified::read8(byte reg)
     @brief  Instantiates a new Adafruit_L3GD20_Unified class
 */
 /**************************************************************************/
-Adafruit_L3GD20_Unified::Adafruit_L3GD20_Unified(int32_t sensorID) {
+Adafruit_L3GD20_Unified::Adafruit_L3GD20_Unified(int32_t sensorID, gyro_type my_type) {
   _sensorID = sensorID;
+  this->type = my_type;
 }
 
 /***************************************************************************
@@ -107,7 +108,7 @@ bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng)
   /* Make sure we have the correct chip ID since this checks
      for correct address and that the IC is properly connected */   
   byte whoami = read8(GYRO_REGISTER_WHO_AM_I); 
-  if (whoami != L3GD20_ID)
+  if (whoami != this->type.deviceID)
   {
     return false;
   }
@@ -213,14 +214,14 @@ void Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
   event->timestamp = millis();
   
   /* Read 6 bytes from the sensor */
-  Wire.beginTransmission((byte)L3GD20_ADDRESS);
+  Wire.beginTransmission((byte)this->type.I2CAddress);
   #if ARDUINO >= 100
     Wire.write(GYRO_REGISTER_OUT_X_L | 0x80);
   #else
     Wire.send(GYRO_REGISTER_OUT_X_L | 0x80);
   #endif
   Wire.endTransmission();
-  Wire.requestFrom((byte)L3GD20_ADDRESS, (byte)6);
+  Wire.requestFrom((byte)this->type.I2CAddress, (byte)6);
 
   /* Wait around until enough data is available */
   while (Wire.available() < 6);
@@ -283,8 +284,8 @@ void  Adafruit_L3GD20_Unified::getSensor(sensor_t* sensor)
   sensor->version     = 1;
   sensor->sensor_id   = _sensorID;
   sensor->type        = SENSOR_TYPE_GYROSCOPE;
-  sensor->min_delay   = 0;
+  sensor->min_delay   = this->type.minDelay;
   sensor->max_value   = (float)this->_range;
   sensor->min_value   = this->_range * -1.0;
-  sensor->resolution  = 0.0F; // TBD
+  sensor->resolution  = this->type.resolution; // TBD
 }
