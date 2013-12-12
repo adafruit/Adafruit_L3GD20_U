@@ -279,7 +279,7 @@ void  Adafruit_L3GD20_Unified::getSensor(sensor_t* sensor)
   memset(sensor, 0, sizeof(sensor_t));
 
   /* Insert the sensor name in the fixed length char array */
-  strncpy (sensor->name, "L3GD20", sizeof(sensor->name) - 1);
+  strncpy (sensor->name, this->type.modelName, sizeof(sensor->name) - 1);
   sensor->name[sizeof(sensor->name)- 1] = 0;
   sensor->version     = 1;
   sensor->sensor_id   = _sensorID;
