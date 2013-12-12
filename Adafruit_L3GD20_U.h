@@ -24,7 +24,6 @@
 #endif
 
 #include <Adafruit_Sensor.h>
-#include <Wire.h>
 
 /*=========================================================================
     I2C ADDRESS/BITS AND SETTINGS
@@ -120,8 +119,6 @@ class Adafruit_L3GD20_Unified : public Adafruit_Sensor
     gyro_type type;
 
   private:
-    void        write8  ( byte reg, byte value );
-    byte        read8   ( byte reg );
     gyroRange_t _range;
     int32_t     _sensorID;
 };

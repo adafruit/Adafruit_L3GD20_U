@@ -21,58 +21,10 @@
 #endif
 
 #include <Wire.h>
+#include "WireHelper.h"
 #include <limits.h>
 
 #include "Adafruit_L3GD20_U.h"
-
-/***************************************************************************
- PRIVATE FUNCTIONS
- ***************************************************************************/
-
-/**************************************************************************/
-/*!
-    @brief  Abstract away platform differences in Arduino wire library
-*/
-/**************************************************************************/
-void Adafruit_L3GD20_Unified::write8(byte reg, byte value)
-{
-  Wire.beginTransmission(this->type.I2CAddress);
-  #if ARDUINO >= 100
-    Wire.write((uint8_t)reg);
-    Wire.write((uint8_t)value);
-  #else
-    Wire.send(reg);
-    Wire.send(value);
-  #endif
-  Wire.endTransmission();
-}
-
-/**************************************************************************/
-/*!
-    @brief  Abstract away platform differences in Arduino wire library
-*/
-/**************************************************************************/
-byte Adafruit_L3GD20_Unified::read8(byte reg)
-{
-  byte value;
-
-  Wire.beginTransmission((byte)this->type.I2CAddress);
-  #if ARDUINO >= 100
-    Wire.write((uint8_t)reg);
-  #else
-    Wire.send(reg);
-  #endif
-  Wire.endTransmission();
-  Wire.requestFrom((byte)this->type.I2CAddress, (byte)1);
-  #if ARDUINO >= 100
-    value = Wire.read();
-  #else
-    value = Wire.receive();
-  #endif  
-  Wire.endTransmission();
-
-  return value;
-}
 
 /***************************************************************************
  CONSTRUCTOR
@@ -99,15 +51,12 @@ Adafruit_L3GD20_Unified::Adafruit_L3GD20_Unified(int32_t sensorID, gyro_type my_
 /**************************************************************************/
 bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng)
 {
-  /* Enable I2C */
-  Wire.begin();
-
   /* Set the range the an appropriate value */  
   _range = rng;
 
   /* Make sure we have the correct chip ID since this checks
      for correct address and that the IC is properly connected */   
-  byte whoami = read8(GYRO_REGISTER_WHO_AM_I); 
+  byte whoami = WireHelper::read(this->type.I2CAddress, GYRO_REGISTER_WHO_AM_I); 
   if (whoami != this->type.deviceID)
   {
     return false;
@@ -125,7 +74,7 @@ bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng)
      0  XEN       X-axis enable (0 = disabled, 1 = enabled)           1 */
 
   /* Switch to normal mode and enable all three channels */
-  write8(GYRO_REGISTER_CTRL_REG1, 0x0F);
+  WireHelper::write(this->type.I2CAddress, GYRO_REGISTER_CTRL_REG1, 0x0F);
   /* ------------------------------------------------------------------ */
 
   /* Set CTRL_REG2 (0x21)
@@ -171,13 +120,13 @@ bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng)
   switch(_range)
   {
     case GYRO_RANGE_250DPS:
-      write8(GYRO_REGISTER_CTRL_REG4, 0x00);
+      WireHelper::write(this->type.I2CAddress, GYRO_REGISTER_CTRL_REG4, 0x00);
       break;
     case GYRO_RANGE_500DPS:
-      write8(GYRO_REGISTER_CTRL_REG4, 0x10);
+      WireHelper::write(this->type.I2CAddress, GYRO_REGISTER_CTRL_REG4, 0x10);
       break;
     case GYRO_RANGE_2000DPS:
-      write8(GYRO_REGISTER_CTRL_REG4, 0x20);
+      WireHelper::write(this->type.I2CAddress, GYRO_REGISTER_CTRL_REG4, 0x20);
       break;
   }
   /* ------------------------------------------------------------------ */
@@ -214,33 +163,15 @@ void Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
   event->timestamp = millis();
   
   /* Read 6 bytes from the sensor */
-  Wire.beginTransmission((byte)this->type.I2CAddress);
-  #if ARDUINO >= 100
-    Wire.write(GYRO_REGISTER_OUT_X_L | 0x80);
-  #else
-    Wire.send(GYRO_REGISTER_OUT_X_L | 0x80);
-  #endif
-  Wire.endTransmission();
-  Wire.requestFrom((byte)this->type.I2CAddress, (byte)6);
+  byte buffer[6];
+  WireHelper::read(this->type.I2CAddress, GYRO_REGISTER_OUT_X_L | 0x80, 6, buffer);
 
-  /* Wait around until enough data is available */
-  while (Wire.available() < 6);
-
-  #if ARDUINO >= 100
-    uint8_t xlo = Wire.read();
-    uint8_t xhi = Wire.read();
-    uint8_t ylo = Wire.read();
-    uint8_t yhi = Wire.read();
-    uint8_t zlo = Wire.read();
-    uint8_t zhi = Wire.read();
-  #else
-    uint8_t xlo = Wire.receive();
-    uint8_t xhi = Wire.receive();
-    uint8_t ylo = Wire.receive();
-    uint8_t yhi = Wire.receive();
-    uint8_t zlo = Wire.receive();
-    uint8_t zhi = Wire.receive();
-  #endif    
+  uint8_t xlo = buffer[0];
+  uint8_t xhi = buffer[1];
+  uint8_t ylo = buffer[2];
+  uint8_t yhi = buffer[3];
+  uint8_t zlo = buffer[4];
+  uint8_t zhi = buffer[5];
   
   /* Shift values to create properly formed integer (low byte first) */
   event->gyro.x = (xlo | (xhi << 8));
