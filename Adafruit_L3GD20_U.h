@@ -37,6 +37,33 @@
     #define GYRO_SENSITIVITY_2000DPS (0.070F)      // Roughly 18/256
 /*=========================================================================*/
 
+typedef struct
+{
+  String modelName;
+  byte I2CAddress;
+  byte deviceID;
+  float resolution;
+  int32_t minDelay;
+} gyro_type;
+
+/* resolution and minDelay need to be pulled from dataSheets */
+const gyro_type L3GD20_type = {
+  "L3GD20", //modelName
+  0x6B, //I2CAddress
+  0b11010100, //deviceID
+  0, //resolution   
+  0, //minDelay
+};
+
+const gyro_type L3G4200D_type = {
+  "L3G4200D", //modelName
+  0x69, //I2CAddress
+  0b11010011, //deviceID
+  0, //resolution
+  0, //minDelay
+};
+
+
 /*=========================================================================
     REGISTERS
     -----------------------------------------------------------------------*/
@@ -85,11 +112,12 @@
 class Adafruit_L3GD20_Unified : public Adafruit_Sensor
 {
   public:
-    Adafruit_L3GD20_Unified(int32_t sensorID = -1);
+    Adafruit_L3GD20_Unified(int32_t sensorID = -1, gyro_type my_type = L3GD20_type);
 
     bool begin     ( gyroRange_t rng = GYRO_RANGE_250DPS );
     void getEvent  ( sensors_event_t* );
     void getSensor ( sensor_t* );
+    gyro_type type;
 
   private:
     void        write8  ( byte reg, byte value );
