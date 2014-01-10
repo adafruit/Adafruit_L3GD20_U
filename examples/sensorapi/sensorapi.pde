@@ -1,4 +1,5 @@
 #include <Wire.h>
+#include <WireHelper.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_L3GD20_U.h>
 
