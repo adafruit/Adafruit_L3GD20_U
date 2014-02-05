@@ -265,6 +265,11 @@ void Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
       event->gyro.z *= GYRO_SENSITIVITY_2000DPS;
       break;
   }
+  
+  /* Convert values to rad/s */
+  event->gyro.x *= SENSORS_DPS_TO_RADS;
+  event->gyro.y *= SENSORS_DPS_TO_RADS;
+  event->gyro.z *= SENSORS_DPS_TO_RADS;
 }
 
 /**************************************************************************/
@@ -284,7 +289,7 @@ void  Adafruit_L3GD20_Unified::getSensor(sensor_t* sensor)
   sensor->sensor_id   = _sensorID;
   sensor->type        = SENSOR_TYPE_GYROSCOPE;
   sensor->min_delay   = 0;
-  sensor->max_value   = (float)this->_range;
-  sensor->min_value   = this->_range * -1.0;
+  sensor->max_value   = (float)this->_range * SENSORS_DPS_TO_RADS;
+  sensor->min_value   = (this->_range * -1.0) * SENSORS_DPS_TO_RADS;
   sensor->resolution  = 0.0F; // TBD
 }
