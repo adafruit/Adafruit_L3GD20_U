@@ -242,9 +242,9 @@ void Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
   #endif    
   
   /* Shift values to create properly formed integer (low byte first) */
-  event->gyro.x = (xlo | (xhi << 8));
-  event->gyro.y = (ylo | (yhi << 8));
-  event->gyro.z = (zlo | (zhi << 8));
+  event->gyro.x = (int16_t)(xlo | (xhi << 8));
+  event->gyro.y = (int16_t)(ylo | (yhi << 8));
+  event->gyro.z = (int16_t)(zlo | (zhi << 8));
   
   /* Compensate values depending on the resolution */
   switch(_range)
