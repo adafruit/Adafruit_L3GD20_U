@@ -286,7 +286,7 @@ void Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
             write8(GYRO_REGISTER_CTRL_REG4, 0x20);
             write8(GYRO_REGISTER_CTRL_REG5, 0x80);
             readingValid = false;
-            Serial.println("Changing range to 2000DPS");
+            // Serial.println("Changing range to 2000DPS");
             break;
           case GYRO_RANGE_250DPS:
             /* Push the range up to 500dps */
@@ -296,7 +296,7 @@ void Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
             write8(GYRO_REGISTER_CTRL_REG4, 0x10);
             write8(GYRO_REGISTER_CTRL_REG5, 0x80);
             readingValid = false;
-            Serial.println("Changing range to 500DPS");
+            // Serial.println("Changing range to 500DPS");
             break;
           default:
             readingValid = true;
