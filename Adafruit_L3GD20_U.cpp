@@ -64,6 +64,7 @@ byte Adafruit_L3GD20_Unified::read8(byte reg)
   #endif
   Wire.endTransmission();
   Wire.requestFrom((byte)L3GD20_ADDRESS, (byte)1);
+  while (!Wire.available()); // Wait for data to arrive.
   #if ARDUINO >= 100
     value = Wire.read();
   #else
