@@ -1,10 +1,10 @@
 /***************************************************
   This is a library for the L3GD20 GYROSCOPE
 
-  Designed specifically to work with the Adafruit L3GD20 Breakout 
+  Designed specifically to work with the Adafruit L3GD20 Breakout
   ----> https://www.adafruit.com/products/1032
 
-  These sensors use I2C or SPI to communicate, 2 pins (I2C) 
+  These sensors use I2C or SPI to communicate, 2 pins (I2C)
   or 4 pins (SPI) are required to interface.
 
   Adafruit invests time and resources providing this open source code,
@@ -68,7 +68,7 @@
       GYRO_REGISTER_TSH_ZH              = 0x36,   // 00000000   rw
       GYRO_REGISTER_TSH_ZL              = 0x37,   // 00000000   rw
       GYRO_REGISTER_INT1_DURATION       = 0x38    // 00000000   rw
-    } gyroRegisters_t;    
+    } gyroRegisters_t;
 /*=========================================================================*/
 
 /*=========================================================================
