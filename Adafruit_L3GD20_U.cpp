@@ -210,6 +210,19 @@ void Adafruit_L3GD20_Unified::enableAutoRange(bool enabled)
   _autoRangeEnabled = enabled;
 }
 
+void Adafruit_L3GD20_Unified::enableDRDYInterrupt(bool enabled)
+{
+  byte existing = read8(GYRO_REGISTER_CTRL_REG3);
+
+  if (enabled) {
+    write8(GYRO_REGISTER_CTRL_REG3, existing |= 1<<3);
+  } else {
+    write8(GYRO_REGISTER_CTRL_REG3, existing &= ~(1<<3));
+  }
+
+  // write8(GYRO_REGISTER_FIFO_CTRL_REG, 0x40);
+}
+
 /**************************************************************************/
 /*!
     @brief  Gets the most recent sensor event
