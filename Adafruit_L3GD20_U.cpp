@@ -210,6 +210,11 @@ void Adafruit_L3GD20_Unified::enableAutoRange(bool enabled)
   _autoRangeEnabled = enabled;
 }
 
+/**************************************************************************/
+/*!
+    @brief  Enables (or disables) the Data Ready interrupt
+*/
+/**************************************************************************/
 void Adafruit_L3GD20_Unified::enableDRDYInterrupt(bool enabled)
 {
   byte existing = read8(GYRO_REGISTER_CTRL_REG3);
@@ -219,8 +224,6 @@ void Adafruit_L3GD20_Unified::enableDRDYInterrupt(bool enabled)
   } else {
     write8(GYRO_REGISTER_CTRL_REG3, existing &= ~(1<<3));
   }
-
-  // write8(GYRO_REGISTER_FIFO_CTRL_REG, 0x40);
 }
 
 /**************************************************************************/
