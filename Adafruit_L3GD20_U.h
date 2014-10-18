@@ -85,6 +85,18 @@
 /*=========================================================================*/
 
 /*=========================================================================
+    OUTPUT DATA RATE SETTINGS
+    -----------------------------------------------------------------------*/
+    typedef enum
+    {
+      GYRO_ODR_95                       = 0x00, // 95 Hz
+      GYRO_ODR_190                      = 0x01, // 190 Hz
+      GYRO_ODR_380                      = 0x02, // 380 Hz
+      GYRO_ODR_760                      = 0x03 // 760 Hz
+    } gyroDataRate;
+/*=========================================================================*/
+
+/*=========================================================================
     RAW GYROSCOPE DATA TYPE
     -----------------------------------------------------------------------*/
     /** Encapsulates a single raw data sample from the sensor. */
@@ -110,6 +122,7 @@ class Adafruit_L3GD20_Unified : public Adafruit_Sensor
     bool begin           ( gyroRange_t rng = GYRO_RANGE_250DPS, TwoWire *theWire=&Wire);
     void enableAutoRange ( bool enabled );
     void enableDRDYInterrupt ( bool enabled );
+    void setOutputDataRate ( gyroDataRate odr );
     bool getEvent        ( sensors_event_t* );
     void getSensor       ( sensor_t* );
 
