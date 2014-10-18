@@ -82,6 +82,18 @@
     } gyroRange_t;
 /*=========================================================================*/
 
+/*=========================================================================
+    OUTPUT DATA RATE SETTINGS
+    -----------------------------------------------------------------------*/
+    typedef enum
+    {
+      GYRO_ODR_95                       = 0x00, // 95 Hz
+      GYRO_ODR_190                      = 0x01, // 190 Hz
+      GYRO_ODR_380                      = 0x02, // 380 Hz
+      GYRO_ODR_760                      = 0x03 // 760 Hz
+    } gyroDataRate;
+/*=========================================================================*/
+
 class Adafruit_L3GD20_Unified : public Adafruit_Sensor
 {
   public:
@@ -90,6 +102,7 @@ class Adafruit_L3GD20_Unified : public Adafruit_Sensor
     bool begin           ( gyroRange_t rng = GYRO_RANGE_250DPS );
     void enableAutoRange ( bool enabled );
     void enableDRDYInterrupt ( bool enabled );
+    void setOutputDataRate ( gyroDataRate odr );
     void getEvent        ( sensors_event_t* );
     void getSensor       ( sensor_t* );
 
