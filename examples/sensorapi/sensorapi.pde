@@ -26,6 +26,9 @@ void setup(void)
   Serial.begin(9600);
   Serial.println("Gyroscope Test"); Serial.println("");
   
+  /* Enable auto-ranging */
+  gyro.enableAutoRange(true);
+  
   /* Initialise the sensor */
   if(!gyro.begin())
   {

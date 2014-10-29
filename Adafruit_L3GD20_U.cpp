@@ -64,6 +64,7 @@ byte Adafruit_L3GD20_Unified::read8(byte reg)
   #endif
   Wire.endTransmission();
   Wire.requestFrom((byte)L3GD20_ADDRESS, (byte)1);
+  while (!Wire.available()); // Wait for data to arrive.
   #if ARDUINO >= 100
     value = Wire.read();
   #else
@@ -85,6 +86,7 @@ byte Adafruit_L3GD20_Unified::read8(byte reg)
 /**************************************************************************/
 Adafruit_L3GD20_Unified::Adafruit_L3GD20_Unified(int32_t sensorID) {
   _sensorID = sensorID;
+  _autoRangeEnabled = false;
 }
 
 /***************************************************************************
@@ -124,7 +126,8 @@ bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng)
      1  YEN       Y-axis enable (0 = disabled, 1 = enabled)           1
      0  XEN       X-axis enable (0 = disabled, 1 = enabled)           1 */
 
-  /* Switch to normal mode and enable all three channels */
+  /* Reset then switch to normal mode and enable all three channels */
+  write8(GYRO_REGISTER_CTRL_REG1, 0x00);
   write8(GYRO_REGISTER_CTRL_REG1, 0x0F);
   /* ------------------------------------------------------------------ */
 
@@ -200,52 +203,115 @@ bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng)
 
 /**************************************************************************/
 /*! 
+    @brief  Enables or disables auto-ranging
+*/
+/**************************************************************************/
+void Adafruit_L3GD20_Unified::enableAutoRange(bool enabled)
+{
+  _autoRangeEnabled = enabled;
+}
+
+/**************************************************************************/
+/*! 
     @brief  Gets the most recent sensor event
 */
 /**************************************************************************/
 void Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
 {
+  bool readingValid = false;
+  
   /* Clear the event */
   memset(event, 0, sizeof(sensors_event_t));
 
   event->version   = sizeof(sensors_event_t);
   event->sensor_id = _sensorID;
   event->type      = SENSOR_TYPE_GYROSCOPE;
-  event->timestamp = millis();
   
-  /* Read 6 bytes from the sensor */
-  Wire.beginTransmission((byte)L3GD20_ADDRESS);
-  #if ARDUINO >= 100
-    Wire.write(GYRO_REGISTER_OUT_X_L | 0x80);
-  #else
-    Wire.send(GYRO_REGISTER_OUT_X_L | 0x80);
-  #endif
-  Wire.endTransmission();
-  Wire.requestFrom((byte)L3GD20_ADDRESS, (byte)6);
-
-  /* Wait around until enough data is available */
-  while (Wire.available() < 6);
-
-  #if ARDUINO >= 100
-    uint8_t xlo = Wire.read();
-    uint8_t xhi = Wire.read();
-    uint8_t ylo = Wire.read();
-    uint8_t yhi = Wire.read();
-    uint8_t zlo = Wire.read();
-    uint8_t zhi = Wire.read();
-  #else
-    uint8_t xlo = Wire.receive();
-    uint8_t xhi = Wire.receive();
-    uint8_t ylo = Wire.receive();
-    uint8_t yhi = Wire.receive();
-    uint8_t zlo = Wire.receive();
-    uint8_t zhi = Wire.receive();
-  #endif    
+  while(!readingValid)
+  {
+    event->timestamp = millis();
   
-  /* Shift values to create properly formed integer (low byte first) */
-  event->gyro.x = (int16_t)(xlo | (xhi << 8));
-  event->gyro.y = (int16_t)(ylo | (yhi << 8));
-  event->gyro.z = (int16_t)(zlo | (zhi << 8));
+    /* Read 6 bytes from the sensor */
+    Wire.beginTransmission((byte)L3GD20_ADDRESS);
+    #if ARDUINO >= 100
+      Wire.write(GYRO_REGISTER_OUT_X_L | 0x80);
+    #else
+      Wire.send(GYRO_REGISTER_OUT_X_L | 0x80);
+    #endif
+    Wire.endTransmission();
+    Wire.requestFrom((byte)L3GD20_ADDRESS, (byte)6);
+
+    /* Wait around until enough data is available */
+    while (Wire.available() < 6);
+
+    #if ARDUINO >= 100
+      uint8_t xlo = Wire.read();
+      uint8_t xhi = Wire.read();
+      uint8_t ylo = Wire.read();
+      uint8_t yhi = Wire.read();
+      uint8_t zlo = Wire.read();
+      uint8_t zhi = Wire.read();
+    #else
+      uint8_t xlo = Wire.receive();
+      uint8_t xhi = Wire.receive();
+      uint8_t ylo = Wire.receive();
+      uint8_t yhi = Wire.receive();
+      uint8_t zlo = Wire.receive();
+      uint8_t zhi = Wire.receive();
+    #endif    
+  
+    /* Shift values to create properly formed integer (low byte first) */
+    event->gyro.x = (int16_t)(xlo | (xhi << 8));
+    event->gyro.y = (int16_t)(ylo | (yhi << 8));
+    event->gyro.z = (int16_t)(zlo | (zhi << 8));
+    
+    /* Make sure the sensor isn't saturating if auto-ranging is enabled */
+    if (!_autoRangeEnabled)
+    {
+      readingValid = true;
+    }
+    else
+    {
+      /* Check if the sensor is saturating or not */
+      if ( (event->gyro.x >= 32760) | (event->gyro.x <= -32760) | 
+           (event->gyro.y >= 32760) | (event->gyro.y <= -32760) | 
+           (event->gyro.z >= 32760) | (event->gyro.z <= -32760) )
+      {
+        /* Saturating .... increase the range if we can */
+        switch(_range)
+        {
+          case GYRO_RANGE_500DPS:
+            /* Push the range up to 2000dps */
+            _range = GYRO_RANGE_2000DPS;
+            write8(GYRO_REGISTER_CTRL_REG1, 0x00);
+            write8(GYRO_REGISTER_CTRL_REG1, 0x0F);
+            write8(GYRO_REGISTER_CTRL_REG4, 0x20);
+            write8(GYRO_REGISTER_CTRL_REG5, 0x80);
+            readingValid = false;
+            // Serial.println("Changing range to 2000DPS");
+            break;
+          case GYRO_RANGE_250DPS:
+            /* Push the range up to 500dps */
+            _range = GYRO_RANGE_500DPS;
+            write8(GYRO_REGISTER_CTRL_REG1, 0x00);
+            write8(GYRO_REGISTER_CTRL_REG1, 0x0F);
+            write8(GYRO_REGISTER_CTRL_REG4, 0x10);
+            write8(GYRO_REGISTER_CTRL_REG5, 0x80);
+            readingValid = false;
+            // Serial.println("Changing range to 500DPS");
+            break;
+          default:
+            readingValid = true;
+            break;  
+        }
+      }
+      else
+      {
+        /* All values are withing range */
+        readingValid = true;
+      }
+    }
+  }
   
   /* Compensate values depending on the resolution */
   switch(_range)
