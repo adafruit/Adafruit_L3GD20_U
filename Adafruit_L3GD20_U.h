@@ -31,7 +31,8 @@
     -----------------------------------------------------------------------*/
     #define L3GD20_ADDRESS           (0x6B)        // 1101011
     #define L3GD20_POLL_TIMEOUT      (100)         // Maximum number of read attempts
-    #define L3GD20_ID                (0b11010100)
+    #define L3GD20_ID                0xD4
+    #define L3GD20H_ID               0xD7
     #define GYRO_SENSITIVITY_250DPS  (0.00875F)    // Roughly 22/256 for fixed point match
     #define GYRO_SENSITIVITY_500DPS  (0.0175F)     // Roughly 45/256
     #define GYRO_SENSITIVITY_2000DPS (0.070F)      // Roughly 18/256

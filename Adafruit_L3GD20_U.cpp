@@ -105,9 +105,10 @@ bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng)
   _range = rng;
 
   /* Make sure we have the correct chip ID since this checks
-     for correct address and that the IC is properly connected */   
-  byte whoami = read8(GYRO_REGISTER_WHO_AM_I); 
-  if (whoami != L3GD20_ID)
+     for correct address and that the IC is properly connected */
+  uint8_t id = read8(GYRO_REGISTER_WHO_AM_I);
+  //Serial.println(id, HEX);
+  if ((id != L3GD20_ID) && (id != L3GD20H_ID))
   {
     return false;
   }
