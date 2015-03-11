@@ -245,7 +245,7 @@ void Adafruit_L3GD20_Unified::setOutputDataRate(gyroDataRate odr)
     @brief  Gets the most recent sensor event
 */
 /**************************************************************************/
-void Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
+bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
 {
   bool readingValid = false;
 
@@ -366,6 +366,8 @@ void Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
   event->gyro.x *= SENSORS_DPS_TO_RADS;
   event->gyro.y *= SENSORS_DPS_TO_RADS;
   event->gyro.z *= SENSORS_DPS_TO_RADS;
+  
+  return true;
 }
 
 /**************************************************************************/
