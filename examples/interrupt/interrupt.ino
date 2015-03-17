@@ -34,22 +34,8 @@ void setup() {
 
   attachInterrupt(0, gyroDataReadyISR, RISING);
 
-  Wire.begin();
-  /*
-    Set 400mhz bus speed.
-    TWI_FREQ = 400000L;
-    TWBR = ((F_CPU / TWI_FREQ) - 16) / 2;
-    TWBR = ((16,000,000 / 400,000) - 16) / 2;
-    TWBR = (40 - 16) / 2;
-    TWBR = 24 / 2;
-    http://playground.arduino.cc/Code/ATMELTWI
-  */
-  //TWBR = 12;    // 16MHz
-  //TWBR = 7;     // 12Mhz
-  //TWBR = 2;     // 8Mhz
-
   if (!gyro.begin(GYRO_RANGE_250DPS)) {
-    Serial.print("Ooops, no L3GD20 detected ... Check your wiring or I2C ADDR!");
+    Serial.print(F("Ooops, no L3GD20 detected ... Check your wiring or I2C ADDR!"));
     while(1);
   }
   gyro.enableDRDYInterrupt(true);
