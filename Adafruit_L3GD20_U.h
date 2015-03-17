@@ -104,7 +104,7 @@ class Adafruit_L3GD20_Unified : public Adafruit_Sensor
     void enableAutoRange ( bool enabled );
     void enableDRDYInterrupt ( bool enabled );
     void setOutputDataRate ( gyroDataRate odr );
-    void getEvent        ( sensors_event_t* );
+    bool getEvent        ( sensors_event_t* );
     void getSensor       ( sensor_t* );
 
   private:
