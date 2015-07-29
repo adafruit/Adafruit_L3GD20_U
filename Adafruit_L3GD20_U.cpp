@@ -238,11 +238,11 @@ bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
     #else
       Wire.send(GYRO_REGISTER_OUT_X_L | 0x80);
     #endif
-    Wire.endTransmission();
+    if (Wire.endTransmission() != 0) {
+        // Error. Retry.
+        continue;
+    }
     Wire.requestFrom((byte)L3GD20_ADDRESS, (byte)6);
-
-    /* Wait around until enough data is available */
-    while (Wire.available() < 6);
 
     #if ARDUINO >= 100
       uint8_t xlo = Wire.read();
