@@ -1,10 +1,10 @@
 /***************************************************
   This is a library for the L3GD20 GYROSCOPE
 
-  Designed specifically to work with the Adafruit L3GD20 Breakout 
+  Designed specifically to work with the Adafruit L3GD20 Breakout
   ----> https://www.adafruit.com/products/1032
 
-  These sensors use I2C or SPI to communicate, 2 pins (I2C) 
+  These sensors use I2C or SPI to communicate, 2 pins (I2C)
   or 4 pins (SPI) are required to interface.
 
   Adafruit invests time and resources providing this open source code,
@@ -69,7 +69,7 @@ byte Adafruit_L3GD20_Unified::read8(byte reg)
     value = Wire.read();
   #else
     value = Wire.receive();
-  #endif  
+  #endif
   Wire.endTransmission();
 
   return value;
@@ -78,7 +78,7 @@ byte Adafruit_L3GD20_Unified::read8(byte reg)
 /***************************************************************************
  CONSTRUCTOR
  ***************************************************************************/
- 
+
 /**************************************************************************/
 /*!
     @brief  Instantiates a new Adafruit_L3GD20_Unified class
@@ -92,7 +92,7 @@ Adafruit_L3GD20_Unified::Adafruit_L3GD20_Unified(int32_t sensorID) {
 /***************************************************************************
  PUBLIC FUNCTIONS
  ***************************************************************************/
- 
+
 /**************************************************************************/
 /*!
     @brief  Setups the HW
@@ -103,7 +103,7 @@ bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng)
   /* Enable I2C */
   Wire.begin();
 
-  /* Set the range the an appropriate value */  
+  /* Set the range the an appropriate value */
   _range = rng;
 
   /* Make sure we have the correct chip ID since this checks
@@ -202,7 +202,7 @@ bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng)
 }
 
 /**************************************************************************/
-/*! 
+/*!
     @brief  Enables or disables auto-ranging
 */
 /**************************************************************************/
@@ -212,25 +212,54 @@ void Adafruit_L3GD20_Unified::enableAutoRange(bool enabled)
 }
 
 /**************************************************************************/
-/*! 
+/*!
+    @brief  Enables (or disables) the Data Ready interrupt
+*/
+/**************************************************************************/
+void Adafruit_L3GD20_Unified::enableDRDYInterrupt(bool enabled)
+{
+  byte existing = read8(GYRO_REGISTER_CTRL_REG3);
+
+  if (enabled) {
+    write8(GYRO_REGISTER_CTRL_REG3, existing |= 1<<3);
+  } else {
+    write8(GYRO_REGISTER_CTRL_REG3, existing &= ~(1<<3));
+  }
+}
+
+/**************************************************************************/
+/*!
+    @brief  Sets the Output Data Rate
+*/
+/**************************************************************************/
+void Adafruit_L3GD20_Unified::setOutputDataRate(gyroDataRate odr)
+{
+  byte existing = read8(GYRO_REGISTER_CTRL_REG1);
+
+  write8(GYRO_REGISTER_CTRL_REG1, existing &= ~(3<<6));
+  write8(GYRO_REGISTER_CTRL_REG1, existing |= odr<<6);
+}
+
+/**************************************************************************/
+/*!
     @brief  Gets the most recent sensor event
 */
 /**************************************************************************/
 bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
 {
   bool readingValid = false;
-  
+
   /* Clear the event */
   memset(event, 0, sizeof(sensors_event_t));
 
   event->version   = sizeof(sensors_event_t);
   event->sensor_id = _sensorID;
   event->type      = SENSOR_TYPE_GYROSCOPE;
-  
+
   while(!readingValid)
   {
     event->timestamp = millis();
-  
+
     /* Read 6 bytes from the sensor */
     Wire.beginTransmission((byte)L3GD20_ADDRESS);
     #if ARDUINO >= 100
@@ -258,13 +287,13 @@ bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
       uint8_t yhi = Wire.receive();
       uint8_t zlo = Wire.receive();
       uint8_t zhi = Wire.receive();
-    #endif    
-  
+    #endif
+
     /* Shift values to create properly formed integer (low byte first) */
     event->gyro.x = (int16_t)(xlo | (xhi << 8));
     event->gyro.y = (int16_t)(ylo | (yhi << 8));
     event->gyro.z = (int16_t)(zlo | (zhi << 8));
-    
+
     /* Make sure the sensor isn't saturating if auto-ranging is enabled */
     if (!_autoRangeEnabled)
     {
@@ -273,8 +302,8 @@ bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
     else
     {
       /* Check if the sensor is saturating or not */
-      if ( (event->gyro.x >= 32760) | (event->gyro.x <= -32760) | 
-           (event->gyro.y >= 32760) | (event->gyro.y <= -32760) | 
+      if ( (event->gyro.x >= 32760) | (event->gyro.x <= -32760) |
+           (event->gyro.y >= 32760) | (event->gyro.y <= -32760) |
            (event->gyro.z >= 32760) | (event->gyro.z <= -32760) )
       {
         /* Saturating .... increase the range if we can */
@@ -302,7 +331,7 @@ bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
             break;
           default:
             readingValid = true;
-            break;  
+            break;
         }
       }
       else
@@ -312,7 +341,7 @@ bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
       }
     }
   }
-  
+
   /* Compensate values depending on the resolution */
   switch(_range)
   {
@@ -332,7 +361,7 @@ bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
       event->gyro.z *= GYRO_SENSITIVITY_2000DPS;
       break;
   }
-  
+
   /* Convert values to rad/s */
   event->gyro.x *= SENSORS_DPS_TO_RADS;
   event->gyro.y *= SENSORS_DPS_TO_RADS;
@@ -342,12 +371,12 @@ bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
 }
 
 /**************************************************************************/
-/*! 
+/*!
     @brief  Gets the sensor_t data
 */
 /**************************************************************************/
 void  Adafruit_L3GD20_Unified::getSensor(sensor_t* sensor)
-{  
+{
   /* Clear the sensor_t object */
   memset(sensor, 0, sizeof(sensor_t));
 
