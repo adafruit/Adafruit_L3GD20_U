@@ -36,15 +36,15 @@
 /**************************************************************************/
 void Adafruit_L3GD20_Unified::write8(byte reg, byte value)
 {
-  Wire.beginTransmission(L3GD20_ADDRESS);
+  _wire->beginTransmission(L3GD20_ADDRESS);
   #if ARDUINO >= 100
-    Wire.write((uint8_t)reg);
-    Wire.write((uint8_t)value);
+    _wire->write((uint8_t)reg);
+    _wire->write((uint8_t)value);
   #else
-    Wire.send(reg);
-    Wire.send(value);
+    _wire->send(reg);
+    _wire->send(value);
   #endif
-  Wire.endTransmission();
+  _wire->endTransmission();
 }
 
 /**************************************************************************/
@@ -56,21 +56,21 @@ byte Adafruit_L3GD20_Unified::read8(byte reg)
 {
   byte value;
 
-  Wire.beginTransmission((byte)L3GD20_ADDRESS);
+  _wire->beginTransmission((byte)L3GD20_ADDRESS);
   #if ARDUINO >= 100
-    Wire.write((uint8_t)reg);
+    _wire->write((uint8_t)reg);
   #else
-    Wire.send(reg);
+    _wire->send(reg);
   #endif
-  Wire.endTransmission();
-  Wire.requestFrom((byte)L3GD20_ADDRESS, (byte)1);
-  while (!Wire.available()); // Wait for data to arrive.
+  _wire->endTransmission();
+  _wire->requestFrom((byte)L3GD20_ADDRESS, (byte)1);
+  while (!_wire->available()); // Wait for data to arrive.
   #if ARDUINO >= 100
-    value = Wire.read();
+    value = _wire->read();
   #else
-    value = Wire.receive();
+    value = _wire->receive();
   #endif  
-  Wire.endTransmission();
+  _wire->endTransmission();
 
   return value;
 }
@@ -81,12 +81,21 @@ byte Adafruit_L3GD20_Unified::read8(byte reg)
  
 /**************************************************************************/
 /*!
-    @brief  Instantiates a new Adafruit_L3GD20_Unified class
+    @brief  Instantiates a new Adafruit_L3GD20_Unified class with the specified I2C wire
 */
 /**************************************************************************/
-Adafruit_L3GD20_Unified::Adafruit_L3GD20_Unified(int32_t sensorID) {
+Adafruit_L3GD20_Unified::Adafruit_L3GD20_Unified(TwoWire* wire, int32_t sensorID) {
+  _wire = wire;
   _sensorID = sensorID;
   _autoRangeEnabled = false;
+}
+
+/**************************************************************************/
+/*!
+@brief  Instantiates a new Adafruit_L3GD20_Unified class using the default I2C wire
+*/
+/**************************************************************************/
+Adafruit_L3GD20_Unified::Adafruit_L3GD20_Unified(int32_t sensorID) : Adafruit_L3GD20_Unified(&Wire, sensorID){
 }
 
 /***************************************************************************
@@ -101,7 +110,7 @@ Adafruit_L3GD20_Unified::Adafruit_L3GD20_Unified(int32_t sensorID) {
 bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng)
 {
   /* Enable I2C */
-  Wire.begin();
+  _wire->begin();
 
   /* Set the range the an appropriate value */  
   _range = rng;
@@ -232,32 +241,32 @@ bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
     event->timestamp = millis();
   
     /* Read 6 bytes from the sensor */
-    Wire.beginTransmission((byte)L3GD20_ADDRESS);
+    _wire->beginTransmission((byte)L3GD20_ADDRESS);
     #if ARDUINO >= 100
-      Wire.write(GYRO_REGISTER_OUT_X_L | 0x80);
+      _wire->write(GYRO_REGISTER_OUT_X_L | 0x80);
     #else
-      Wire.send(GYRO_REGISTER_OUT_X_L | 0x80);
+      _wire->send(GYRO_REGISTER_OUT_X_L | 0x80);
     #endif
-    if (Wire.endTransmission() != 0) {
+    if (_wire->endTransmission() != 0) {
         // Error. Retry.
         continue;
     }
-    Wire.requestFrom((byte)L3GD20_ADDRESS, (byte)6);
+    _wire->requestFrom((byte)L3GD20_ADDRESS, (byte)6);
 
     #if ARDUINO >= 100
-      uint8_t xlo = Wire.read();
-      uint8_t xhi = Wire.read();
-      uint8_t ylo = Wire.read();
-      uint8_t yhi = Wire.read();
-      uint8_t zlo = Wire.read();
-      uint8_t zhi = Wire.read();
+      uint8_t xlo = _wire->read();
+      uint8_t xhi = _wire->read();
+      uint8_t ylo = _wire->read();
+      uint8_t yhi = _wire->read();
+      uint8_t zlo = _wire->read();
+      uint8_t zhi = _wire->read();
     #else
-      uint8_t xlo = Wire.receive();
-      uint8_t xhi = Wire.receive();
-      uint8_t ylo = Wire.receive();
-      uint8_t yhi = Wire.receive();
-      uint8_t zlo = Wire.receive();
-      uint8_t zhi = Wire.receive();
+      uint8_t xlo = _wire->receive();
+      uint8_t xhi = _wire->receive();
+      uint8_t ylo = _wire->receive();
+      uint8_t yhi = _wire->receive();
+      uint8_t zlo = _wire->receive();
+      uint8_t zhi = _wire->receive();
     #endif    
   
     /* Shift values to create properly formed integer (low byte first) */
