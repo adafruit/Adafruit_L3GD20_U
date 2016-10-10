@@ -1,10 +1,10 @@
 /***************************************************
   This is a library for the L3GD20 GYROSCOPE
 
-  Designed specifically to work with the Adafruit L3GD20 Breakout 
+  Designed specifically to work with the Adafruit L3GD20 Breakout
   ----> https://www.adafruit.com/products/1032
 
-  These sensors use I2C or SPI to communicate, 2 pins (I2C) 
+  These sensors use I2C or SPI to communicate, 2 pins (I2C)
   or 4 pins (SPI) are required to interface.
 
   Adafruit invests time and resources providing this open source code,
@@ -69,7 +69,7 @@
       GYRO_REGISTER_TSH_ZH              = 0x36,   // 00000000   rw
       GYRO_REGISTER_TSH_ZL              = 0x37,   // 00000000   rw
       GYRO_REGISTER_INT1_DURATION       = 0x38    // 00000000   rw
-    } gyroRegisters_t;    
+    } gyroRegisters_t;
 /*=========================================================================*/
 
 /*=========================================================================
@@ -83,6 +83,17 @@
     } gyroRange_t;
 /*=========================================================================*/
 
+/*=========================================================================
+    RAW GYROSCOPE DATA TYPE
+    -----------------------------------------------------------------------*/
+    typedef struct gyroRawData_s
+    {
+        int16_t x;
+        int16_t y;
+        int16_t z;
+    } gyroRawData_t;
+/*=========================================================================*/
+
 class Adafruit_L3GD20_Unified : public Adafruit_Sensor
 {
   public:
@@ -92,6 +103,8 @@ class Adafruit_L3GD20_Unified : public Adafruit_Sensor
     void enableAutoRange ( bool enabled );
     bool getEvent        ( sensors_event_t* );
     void getSensor       ( sensor_t* );
+
+    gyroRawData_t raw; /* Raw values from last sensor read */
 
   private:
     void        write8  ( byte reg, byte value );
