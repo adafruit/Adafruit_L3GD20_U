@@ -31,8 +31,8 @@
     -----------------------------------------------------------------------*/
     #define L3GD20_ADDRESS           (0x6B)        // 1101011
     #define L3GD20_POLL_TIMEOUT      (100)         // Maximum number of read attempts
-    #define L3GD20_ID                0xD4
-    #define L3GD20H_ID               0xD7
+    #define L3GD20_ID                (0xD4)
+    #define L3GD20H_ID               (0xD7)
     #define GYRO_SENSITIVITY_250DPS  (0.00875F)    // Roughly 22/256 for fixed point match
     #define GYRO_SENSITIVITY_500DPS  (0.0175F)     // Roughly 45/256
     #define GYRO_SENSITIVITY_2000DPS (0.070F)      // Roughly 18/256
@@ -114,4 +114,35 @@ class Adafruit_L3GD20_Unified : public Adafruit_Sensor
     bool        _autoRangeEnabled;
 };
 
+/* Non Unified (old) driver for compatibility reasons */
+typedef gyroRange_t     l3gd20Range_t;
+typedef gyroRegisters_t l3gd20Registers_t;
+
+typedef struct l3gd20Data_s
+{
+  float x;
+  float y;
+  float z;
+} l3gd20Data;
+
+class Adafruit_L3GD20
+{
+  public:
+    Adafruit_L3GD20(int8_t cs, int8_t mosi, int8_t miso, int8_t clk);
+    Adafruit_L3GD20(void);
+
+    bool begin ( l3gd20Range_t rng=GYRO_RANGE_250DPS, byte addr=L3GD20_ADDRESS );
+    void read  ( void );
+
+    l3gd20Data data;    // Last read will be available here
+
+  private:
+    void write8     ( l3gd20Registers_t reg, byte value );
+    byte read8      ( l3gd20Registers_t reg );
+    uint8_t SPIxfer ( uint8_t x );
+
+    byte          address;
+    l3gd20Range_t range;
+    int8_t        _miso, _mosi, _clk, _cs;
+};
 #endif
