@@ -73,7 +73,6 @@ byte Adafruit_L3GD20_Unified::read8(byte reg)
   #endif
   _i2c->endTransmission();
   _i2c->requestFrom((byte)L3GD20_ADDRESS, (byte)1);
-  while (!_i2c->available()); // Wait for data to arrive.
   #if ARDUINO >= 100
     value = _i2c->read();
   #else
@@ -564,9 +563,6 @@ void Adafruit_L3GD20::read()
     _i2c->write(GYRO_REGISTER_OUT_X_L | 0x80);
     _i2c->endTransmission();
     _i2c->requestFrom(address, (byte)6);
-
-    // Wait around until enough data is available
-    while (_i2c->available() < 6);
 
     xlo = _i2c->read();
     xhi = _i2c->read();
