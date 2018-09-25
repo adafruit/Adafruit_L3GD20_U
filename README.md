@@ -1,5 +1,7 @@
 # Adafruit Unified L3GD20 Driver  [![Build Status](https://travis-ci.org/adafruit/Adafruit_L3GD20_U.svg?branch=master)](https://travis-ci.org/adafruit/Adafruit_L3GD20_U)
 
+> [Official API Documentation](http://adafruit.github.io/Adafruit_L3GD20_U/html/class_adafruit___l3_g_d20___unified.html)
+
 This unified sensor driver is for use with the Adafruit Triple-Axis Gyro sensor and the Adafruit 10DOF Breakout, and has been designed specifically for these boards:
 
   ----> https://www.adafruit.com/products/1032
