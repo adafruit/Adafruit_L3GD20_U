@@ -78,7 +78,6 @@ byte Adafruit_L3GD20_Unified::read8(byte reg)
   #else
     value = _i2c->receive();
   #endif
-  _i2c->endTransmission();
 
   return value;
 }
@@ -647,7 +646,6 @@ byte Adafruit_L3GD20::read8(l3gd20Registers_t reg)
     _i2c->endTransmission();
     _i2c->requestFrom(address, (byte)1);
     value = _i2c->read();
-    _i2c->endTransmission();
   } else {
     digitalWrite(_clk, HIGH);
     digitalWrite(_cs, LOW);
