@@ -30,8 +30,11 @@
  ***************************************************************************/
 
 /**************************************************************************/
-/*!
-    @brief  Abstract away platform differences in Arduino wire library
+/**
+    @brief  Abstracts away platform differences in Arduino wire library
+
+    @param  reg     The register to write to.
+    @param  value   The value to assign to 'reg'.
 */
 /**************************************************************************/
 void Adafruit_L3GD20_Unified::write8(byte reg, byte value)
@@ -48,8 +51,12 @@ void Adafruit_L3GD20_Unified::write8(byte reg, byte value)
 }
 
 /**************************************************************************/
-/*!
-    @brief  Abstract away platform differences in Arduino wire library
+/**
+    @brief  Abstracts away platform differences in Arduino wire library
+
+    @param  reg     The register to read.
+
+    @return The value read from 'reg'.
 */
 /**************************************************************************/
 byte Adafruit_L3GD20_Unified::read8(byte reg)
@@ -80,8 +87,13 @@ byte Adafruit_L3GD20_Unified::read8(byte reg)
  ***************************************************************************/
 
 /**************************************************************************/
-/*!
+/**
     @brief  Instantiates a new Adafruit_L3GD20_Unified class
+
+    @param  sensorID    The unique ID to assign to this sensor instance.
+                        This can be used to distinguish multiple similar
+                        sensors on a system, or to distinguish merged data
+                        in a logging system.
 */
 /**************************************************************************/
 Adafruit_L3GD20_Unified::Adafruit_L3GD20_Unified(int32_t sensorID) {
@@ -94,8 +106,12 @@ Adafruit_L3GD20_Unified::Adafruit_L3GD20_Unified(int32_t sensorID) {
  ***************************************************************************/
 
 /**************************************************************************/
-/*!
+/**
     @brief  Setups the HW
+
+    @param  rng     The 'gyroRange_t' to use when configuring the sensor.
+
+    @return True if the 'begin' process was successful, otherwise false.
 */
 /**************************************************************************/
 bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng)
@@ -207,8 +223,10 @@ bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng)
 }
 
 /**************************************************************************/
-/*!
+/**
     @brief  Enables or disables auto-ranging
+
+    @param  enabled Set to 'true' to enable auto-ranging, 'false' to disable.
 */
 /**************************************************************************/
 void Adafruit_L3GD20_Unified::enableAutoRange(bool enabled)
@@ -217,8 +235,14 @@ void Adafruit_L3GD20_Unified::enableAutoRange(bool enabled)
 }
 
 /**************************************************************************/
-/*!
-    @brief  Gets the most recent sensor event
+/**
+    @brief  Gets the most recent sensor event, containing a new sample
+            from the sensor.
+
+    @param  event   Pointer to the placeholder where the sensor event data
+                    should be written.
+
+    @return True if the event was successfully read, otherwise false.
 */
 /**************************************************************************/
 bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
@@ -357,8 +381,11 @@ bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
 }
 
 /**************************************************************************/
-/*!
-    @brief  Gets the sensor_t data
+/**
+    @brief  Gets the sensor_t data, describing the features of this sensor.
+
+    @param  sensor  The plaxceholder where the 'sensor_t' data should be
+                    written.
 */
 /**************************************************************************/
 void  Adafruit_L3GD20_Unified::getSensor(sensor_t* sensor)
@@ -392,6 +419,7 @@ void  Adafruit_L3GD20_Unified::getSensor(sensor_t* sensor)
  CONSTRUCTOR
  ***************************************************************************/
 
+/// @private
 Adafruit_L3GD20::Adafruit_L3GD20(int8_t cs, int8_t miso, int8_t mosi, int8_t clk) {
   _cs = cs;
   _miso = miso;
@@ -399,11 +427,13 @@ Adafruit_L3GD20::Adafruit_L3GD20(int8_t cs, int8_t miso, int8_t mosi, int8_t clk
   _clk = clk;
 }
 
+/// @private
 Adafruit_L3GD20::Adafruit_L3GD20(void) {
   // use i2c
   _cs = _mosi = _miso = _clk = -1;
 }
 
+/// @private
 bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
 {
   if (_cs == -1) {
@@ -516,6 +546,7 @@ bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
 /***************************************************************************
  PUBLIC FUNCTIONS
  ***************************************************************************/
+ /// @private
 void Adafruit_L3GD20::read()
 {
   uint8_t xhi, xlo, ylo, yhi, zlo, zhi;
@@ -581,6 +612,7 @@ void Adafruit_L3GD20::read()
 /***************************************************************************
  PRIVATE FUNCTIONS
  ***************************************************************************/
+/// @private
 void Adafruit_L3GD20::write8(l3gd20Registers_t reg, byte value)
 {
   if (_cs == -1) {
@@ -600,6 +632,7 @@ void Adafruit_L3GD20::write8(l3gd20Registers_t reg, byte value)
   }
 }
 
+/// @private
 byte Adafruit_L3GD20::read8(l3gd20Registers_t reg)
 {
   byte value;
@@ -625,6 +658,7 @@ byte Adafruit_L3GD20::read8(l3gd20Registers_t reg)
   return value;
 }
 
+/// @private
 uint8_t Adafruit_L3GD20::SPIxfer(uint8_t x) {
   uint8_t value = 0;
 

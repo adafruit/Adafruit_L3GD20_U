@@ -87,14 +87,21 @@
 /*=========================================================================
     RAW GYROSCOPE DATA TYPE
     -----------------------------------------------------------------------*/
+    /** Encapsulates a single raw data sample from the sensor. */
     typedef struct gyroRawData_s
     {
+        /** The X axis data. */
         int16_t x;
+        /** The Y axis data. */
         int16_t y;
+        /** The Z axis data. */
         int16_t z;
     } gyroRawData_t;
 /*=========================================================================*/
 
+/**
+ * Driver for the Adafruit L3GD20 3-Axis gyroscope.
+ */
 class Adafruit_L3GD20_Unified : public Adafruit_Sensor
 {
   public:
@@ -105,7 +112,8 @@ class Adafruit_L3GD20_Unified : public Adafruit_Sensor
     bool getEvent        ( sensors_event_t* );
     void getSensor       ( sensor_t* );
 
-    gyroRawData_t raw; /* Raw values from last sensor read */
+    /** Raw sensor data from the last successful read event. */
+    gyroRawData_t raw;
 
   private:
     void        write8  ( byte reg, byte value );
@@ -119,13 +127,20 @@ class Adafruit_L3GD20_Unified : public Adafruit_Sensor
 typedef gyroRange_t     l3gd20Range_t;
 typedef gyroRegisters_t l3gd20Registers_t;
 
+/**
+ * Encapsulates a single XYZ data sample from the sensor.
+ */
 typedef struct l3gd20Data_s
 {
+  /** Data from the X axis. */
   float x;
+  /** Data from the Y axis. */
   float y;
+  /** Data from the Z axis. */
   float z;
 } l3gd20Data;
 
+/// @private
 class Adafruit_L3GD20
 {
   public:
