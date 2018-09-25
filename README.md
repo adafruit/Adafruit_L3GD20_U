@@ -10,7 +10,7 @@ Check out the links above for our tutorials and wiring diagrams
 The updated 'Unified' sensor driver (based on Adafruit's Sensor API) use I2C to communicate.  If you need to use SPI on the L3GD20, please look at the original (non unified) driver that is still available here: https://github.com/adafruit/Adafruit_L3GD20
 
 Adafruit invests time and resources providing this open source code,
-please support Adafruit and open-source hardware by purchasing 
+please support Adafruit and open-source hardware by purchasing
 products from Adafruit!
 
 ## What is the Adafruit Unified Sensor Library? ##
@@ -31,7 +31,3 @@ Light sensors will always report units in lux, gyroscopes will always report uni
 
 Written by Kevin Townsend for Adafruit Industries.  
 BSD license, all text above must be included in any redistribution
-
-To download. click the **Download ZIP** in the right-hand column, rename the uncompressed folder Adafruit\_L3GD20\_U. Check that the Adafruit\_L3GD20\_U folder contains Adafruit\_L3GD20\U.cpp and Adafruit\_L3GD20\_U.h
-
-Place the Adafruit\_L3GD20\_U library folder your (arduinosketchfolder)/libraries/ folder. You may need to create the libraries subfolder if its your first library. Restart the IDE.

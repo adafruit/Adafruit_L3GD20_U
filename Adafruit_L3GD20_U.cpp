@@ -25,6 +25,8 @@
 
 #include "Adafruit_L3GD20_U.h"
 
+TwoWire *_i2c;            ///< Global I2C interface pointer
+
 /***************************************************************************
  PRIVATE FUNCTIONS
  ***************************************************************************/
@@ -39,15 +41,15 @@
 /**************************************************************************/
 void Adafruit_L3GD20_Unified::write8(byte reg, byte value)
 {
-  Wire.beginTransmission(L3GD20_ADDRESS);
+  _i2c->beginTransmission(L3GD20_ADDRESS);
   #if ARDUINO >= 100
-    Wire.write((uint8_t)reg);
-    Wire.write((uint8_t)value);
+    _i2c->write((uint8_t)reg);
+    _i2c->write((uint8_t)value);
   #else
-    Wire.send(reg);
-    Wire.send(value);
+    _i2c->send(reg);
+    _i2c->send(value);
   #endif
-  Wire.endTransmission();
+  _i2c->endTransmission();
 }
 
 /**************************************************************************/
@@ -63,21 +65,21 @@ byte Adafruit_L3GD20_Unified::read8(byte reg)
 {
   byte value;
 
-  Wire.beginTransmission((byte)L3GD20_ADDRESS);
+  _i2c->beginTransmission((byte)L3GD20_ADDRESS);
   #if ARDUINO >= 100
-    Wire.write((uint8_t)reg);
+    _i2c->write((uint8_t)reg);
   #else
-    Wire.send(reg);
+    _i2c->send(reg);
   #endif
-  Wire.endTransmission();
-  Wire.requestFrom((byte)L3GD20_ADDRESS, (byte)1);
-  while (!Wire.available()); // Wait for data to arrive.
+  _i2c->endTransmission();
+  _i2c->requestFrom((byte)L3GD20_ADDRESS, (byte)1);
+  while (!_i2c->available()); // Wait for data to arrive.
   #if ARDUINO >= 100
-    value = Wire.read();
+    value = _i2c->read();
   #else
-    value = Wire.receive();
+    value = _i2c->receive();
   #endif
-  Wire.endTransmission();
+  _i2c->endTransmission();
 
   return value;
 }
@@ -110,14 +112,19 @@ Adafruit_L3GD20_Unified::Adafruit_L3GD20_Unified(int32_t sensorID) {
     @brief  Setups the HW
 
     @param  rng     The 'gyroRange_t' to use when configuring the sensor.
+    @param  theWire Optional parameter for the I2C device we will use.
+                    Default is "Wire".
 
     @return True if the 'begin' process was successful, otherwise false.
 */
 /**************************************************************************/
-bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng)
+bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng, TwoWire *theWire)
 {
+  /* Set the I2C bus interface. */
+  _i2c = theWire;
+
   /* Enable I2C */
-  Wire.begin();
+  _i2c->begin();
 
   /* Set the range the an appropriate value */
   _range = rng;
@@ -266,32 +273,32 @@ bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
     event->timestamp = millis();
 
     /* Read 6 bytes from the sensor */
-    Wire.beginTransmission((byte)L3GD20_ADDRESS);
+    _i2c->beginTransmission((byte)L3GD20_ADDRESS);
     #if ARDUINO >= 100
-      Wire.write(GYRO_REGISTER_OUT_X_L | 0x80);
+      _i2c->write(GYRO_REGISTER_OUT_X_L | 0x80);
     #else
-      Wire.send(GYRO_REGISTER_OUT_X_L | 0x80);
+      _i2c->send(GYRO_REGISTER_OUT_X_L | 0x80);
     #endif
-    if (Wire.endTransmission() != 0) {
+    if (_i2c->endTransmission() != 0) {
         // Error. Retry.
         continue;
     }
-    Wire.requestFrom((byte)L3GD20_ADDRESS, (byte)6);
+    _i2c->requestFrom((byte)L3GD20_ADDRESS, (byte)6);
 
     #if ARDUINO >= 100
-      uint8_t xlo = Wire.read();
-      uint8_t xhi = Wire.read();
-      uint8_t ylo = Wire.read();
-      uint8_t yhi = Wire.read();
-      uint8_t zlo = Wire.read();
-      uint8_t zhi = Wire.read();
+      uint8_t xlo = _i2c->read();
+      uint8_t xhi = _i2c->read();
+      uint8_t ylo = _i2c->read();
+      uint8_t yhi = _i2c->read();
+      uint8_t zlo = _i2c->read();
+      uint8_t zhi = _i2c->read();
     #else
-      uint8_t xlo = Wire.receive();
-      uint8_t xhi = Wire.receive();
-      uint8_t ylo = Wire.receive();
-      uint8_t yhi = Wire.receive();
-      uint8_t zlo = Wire.receive();
-      uint8_t zhi = Wire.receive();
+      uint8_t xlo = _i2c->receive();
+      uint8_t xhi = _i2c->receive();
+      uint8_t ylo = _i2c->receive();
+      uint8_t yhi = _i2c->receive();
+      uint8_t zlo = _i2c->receive();
+      uint8_t zhi = _i2c->receive();
     #endif
 
     /* Shift values to create properly formed integer (low byte first) */
@@ -437,7 +444,7 @@ Adafruit_L3GD20::Adafruit_L3GD20(void) {
 bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
 {
   if (_cs == -1) {
-    Wire.begin();
+    _i2c->begin();
   } else {
     pinMode(_cs, OUTPUT);
     pinMode(_clk, OUTPUT);
@@ -552,21 +559,21 @@ void Adafruit_L3GD20::read()
   uint8_t xhi, xlo, ylo, yhi, zlo, zhi;
 
   if (_cs == -1) {
-    Wire.beginTransmission(address);
+    _i2c->beginTransmission(address);
     // Make sure to set address auto-increment bit
-    Wire.write(GYRO_REGISTER_OUT_X_L | 0x80);
-    Wire.endTransmission();
-    Wire.requestFrom(address, (byte)6);
+    _i2c->write(GYRO_REGISTER_OUT_X_L | 0x80);
+    _i2c->endTransmission();
+    _i2c->requestFrom(address, (byte)6);
 
     // Wait around until enough data is available
-    while (Wire.available() < 6);
+    while (_i2c->available() < 6);
 
-    xlo = Wire.read();
-    xhi = Wire.read();
-    ylo = Wire.read();
-    yhi = Wire.read();
-    zlo = Wire.read();
-    zhi = Wire.read();
+    xlo = _i2c->read();
+    xhi = _i2c->read();
+    ylo = _i2c->read();
+    yhi = _i2c->read();
+    zlo = _i2c->read();
+    zhi = _i2c->read();
 
   } else {
     digitalWrite(_clk, HIGH);
@@ -617,10 +624,10 @@ void Adafruit_L3GD20::write8(l3gd20Registers_t reg, byte value)
 {
   if (_cs == -1) {
     // use i2c
-    Wire.beginTransmission(address);
-    Wire.write((byte)reg);
-    Wire.write(value);
-    Wire.endTransmission();
+    _i2c->beginTransmission(address);
+    _i2c->write((byte)reg);
+    _i2c->write(value);
+    _i2c->endTransmission();
   } else {
     digitalWrite(_clk, HIGH);
     digitalWrite(_cs, LOW);
@@ -639,12 +646,12 @@ byte Adafruit_L3GD20::read8(l3gd20Registers_t reg)
 
   if (_cs == -1) {
     // use i2c
-    Wire.beginTransmission(address);
-    Wire.write((byte)reg);
-    Wire.endTransmission();
-    Wire.requestFrom(address, (byte)1);
-    value = Wire.read();
-    Wire.endTransmission();
+    _i2c->beginTransmission(address);
+    _i2c->write((byte)reg);
+    _i2c->endTransmission();
+    _i2c->requestFrom(address, (byte)1);
+    value = _i2c->read();
+    _i2c->endTransmission();
   } else {
     digitalWrite(_clk, HIGH);
     digitalWrite(_cs, LOW);

@@ -107,7 +107,7 @@ class Adafruit_L3GD20_Unified : public Adafruit_Sensor
   public:
     Adafruit_L3GD20_Unified(int32_t sensorID = -1);
 
-    bool begin           ( gyroRange_t rng = GYRO_RANGE_250DPS );
+    bool begin           ( gyroRange_t rng = GYRO_RANGE_250DPS, TwoWire *theWire=&Wire);
     void enableAutoRange ( bool enabled );
     bool getEvent        ( sensors_event_t* );
     void getSensor       ( sensor_t* );
