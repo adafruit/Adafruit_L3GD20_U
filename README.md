@@ -1,15 +1,15 @@
-## Adafruit Unified L3GD20 Driver ##
+# Adafruit Unified L3GD20 Driver  [![Build Status](https://travis-ci.org/adafruit/Adafruit_L3GD20_U.svg?branch=master)](https://travis-ci.org/adafruit/Adafruit_L3GD20_U)
 
 This unified sensor driver is for use with the Adafruit Triple-Axis Gyro sensor and the Adafruit 10DOF Breakout, and has been designed specifically for these boards:
 
   ----> https://www.adafruit.com/products/1032
   ----> http://www.adafruit.com/products/1604
 
-Check out the links above for our tutorials and wiring diagrams 
+Check out the links above for our tutorials and wiring diagrams
 
 The updated 'Unified' sensor driver (based on Adafruit's Sensor API) use I2C to communicate.  If you need to use SPI on the L3GD20, please look at the original (non unified) driver that is still available here: https://github.com/adafruit/Adafruit_L3GD20
 
-Adafruit invests time and resources providing this open source code, 
+Adafruit invests time and resources providing this open source code,
 please support Adafruit and open-source hardware by purchasing 
 products from Adafruit!
 
@@ -23,7 +23,7 @@ This is imporant useful for two reasons:
 
 1.) You can use the data right away because it's already converted to SI units that you understand and can compare, rather than meaningless values like 0..1023.
 
-2.) Because SI units are standardised in the sensor library, you can also do quick sanity checks when working with new sensors, or drop in any comparable sensor if you need better sensitivity or if a lower cost unit becomes available, etc. 
+2.) Because SI units are standardised in the sensor library, you can also do quick sanity checks when working with new sensors, or drop in any comparable sensor if you need better sensitivity or if a lower cost unit becomes available, etc.
 
 Light sensors will always report units in lux, gyroscopes will always report units in rad/s, etc. ... freeing you up to focus on the data, rather than digging through the datasheet to understand what the sensor's raw numbers really mean.
 
