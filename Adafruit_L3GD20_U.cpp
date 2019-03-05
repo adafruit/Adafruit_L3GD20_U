@@ -240,6 +240,35 @@ void Adafruit_L3GD20_Unified::enableAutoRange(bool enabled)
 }
 
 /**************************************************************************/
+/*!
+    @brief  Enables (or disables) the Data Ready interrupt
+*/
+/**************************************************************************/
+void Adafruit_L3GD20_Unified::enableDRDYInterrupt(bool enabled)
+{
+  byte existing = read8(GYRO_REGISTER_CTRL_REG3);
+
+  if (enabled) {
+    write8(GYRO_REGISTER_CTRL_REG3, existing |= 1<<3);
+  } else {
+    write8(GYRO_REGISTER_CTRL_REG3, existing &= ~(1<<3));
+  }
+}
+
+/**************************************************************************/
+/*!
+    @brief  Sets the Output Data Rate
+*/
+/**************************************************************************/
+void Adafruit_L3GD20_Unified::setOutputDataRate(gyroDataRate odr)
+{
+  byte existing = read8(GYRO_REGISTER_CTRL_REG1);
+
+  write8(GYRO_REGISTER_CTRL_REG1, existing &= ~(3<<6));
+  write8(GYRO_REGISTER_CTRL_REG1, existing |= odr<<6);
+}
+
+/**************************************************************************/
 /**
     @brief  Gets the most recent sensor event, containing a new sample
             from the sensor.
