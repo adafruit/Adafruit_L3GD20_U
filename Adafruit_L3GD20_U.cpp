@@ -1,23 +1,34 @@
-/***************************************************
-  This is a library for the L3GD20 GYROSCOPE
-
-  Designed specifically to work with the Adafruit L3GD20 Breakout
-  ----> https://www.adafruit.com/products/1032
-
-  These sensors use I2C or SPI to communicate, 2 pins (I2C)
-  or 4 pins (SPI) are required to interface.
-
-  Adafruit invests time and resources providing this open source code,
-  please support Adafruit and open-source hardware by purchasing
-  products from Adafruit!
-
-  Written by Kevin "KTOWN" Townsend for Adafruit Industries.
-  BSD license, all text above must be included in any redistribution
- ****************************************************/
+/*
+ * @file Adafruit_L3GD20_U.cpp
+ *
+ * @mainpage Adafruit L3GD20 Unified Arduino Library
+ *
+ * @section intro_sec Introduction
+ *
+ * This is a library for the L3GD20 GYROSCOPE
+ *
+ * Designed specifically to work with the Adafruit L3GD20 Breakout
+ * ----> https://www.adafruit.com/products/1032
+ *
+ * These sensors use I2C or SPI to communicate, 2 pins (I2C)
+ * or 4 pins (SPI) are required to interface.
+ *
+ * Adafruit invests time and resources providing this open source code,
+ * please support Adafruit and open-source hardware by purchasing
+ * products from Adafruit!
+ *
+ * @section author Author
+ *
+ * Written by Kevin "KTOWN" Townsend for Adafruit Industries.
+ *
+ * @section license License
+ *
+ * BSD license, all text above must be included in any redistribution
+ */
 #if ARDUINO >= 100
- #include "Arduino.h"
+#include "Arduino.h"
 #else
- #include "WProgram.h"
+#include "WProgram.h"
 #endif
 
 #include <Wire.h>
@@ -25,7 +36,7 @@
 
 #include "Adafruit_L3GD20_U.h"
 
-TwoWire *_i2c;            ///< Global I2C interface pointer
+TwoWire *_i2c; ///< Global I2C interface pointer
 
 /***************************************************************************
  PRIVATE FUNCTIONS
@@ -39,16 +50,15 @@ TwoWire *_i2c;            ///< Global I2C interface pointer
     @param  value   The value to assign to 'reg'.
 */
 /**************************************************************************/
-void Adafruit_L3GD20_Unified::write8(byte reg, byte value)
-{
+void Adafruit_L3GD20_Unified::write8(byte reg, byte value) {
   _i2c->beginTransmission(L3GD20_ADDRESS);
-  #if ARDUINO >= 100
-    _i2c->write((uint8_t)reg);
-    _i2c->write((uint8_t)value);
-  #else
-    _i2c->send(reg);
-    _i2c->send(value);
-  #endif
+#if ARDUINO >= 100
+  _i2c->write((uint8_t)reg);
+  _i2c->write((uint8_t)value);
+#else
+  _i2c->send(reg);
+  _i2c->send(value);
+#endif
   _i2c->endTransmission();
 }
 
@@ -61,23 +71,22 @@ void Adafruit_L3GD20_Unified::write8(byte reg, byte value)
     @return The value read from 'reg'.
 */
 /**************************************************************************/
-byte Adafruit_L3GD20_Unified::read8(byte reg)
-{
+byte Adafruit_L3GD20_Unified::read8(byte reg) {
   byte value;
 
   _i2c->beginTransmission((byte)L3GD20_ADDRESS);
-  #if ARDUINO >= 100
-    _i2c->write((uint8_t)reg);
-  #else
-    _i2c->send(reg);
-  #endif
+#if ARDUINO >= 100
+  _i2c->write((uint8_t)reg);
+#else
+  _i2c->send(reg);
+#endif
   _i2c->endTransmission();
   _i2c->requestFrom((byte)L3GD20_ADDRESS, (byte)1);
-  #if ARDUINO >= 100
-    value = _i2c->read();
-  #else
-    value = _i2c->receive();
-  #endif
+#if ARDUINO >= 100
+  value = _i2c->read();
+#else
+  value = _i2c->receive();
+#endif
 
   return value;
 }
@@ -116,8 +125,7 @@ Adafruit_L3GD20_Unified::Adafruit_L3GD20_Unified(int32_t sensorID) {
     @return True if the 'begin' process was successful, otherwise false.
 */
 /**************************************************************************/
-bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng, TwoWire *theWire)
-{
+bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng, TwoWire *theWire) {
   /* Set the I2C bus interface. */
   _i2c = theWire;
 
@@ -135,9 +143,8 @@ bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng, TwoWire *theWire)
   /* Make sure we have the correct chip ID since this checks
      for correct address and that the IC is properly connected */
   uint8_t id = read8(GYRO_REGISTER_WHO_AM_I);
-  //Serial.println(id, HEX);
-  if ((id != L3GD20_ID) && (id != L3GD20H_ID))
-  {
+  // Serial.println(id, HEX);
+  if ((id != L3GD20_ID) && (id != L3GD20H_ID)) {
     return false;
   }
 
@@ -197,17 +204,16 @@ bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng, TwoWire *theWire)
      0  SIM       SPI Mode (0=4-wire, 1=3-wire)                       0 */
 
   /* Adjust resolution if requested */
-  switch(_range)
-  {
-    case GYRO_RANGE_250DPS:
-      write8(GYRO_REGISTER_CTRL_REG4, 0x00);
-      break;
-    case GYRO_RANGE_500DPS:
-      write8(GYRO_REGISTER_CTRL_REG4, 0x10);
-      break;
-    case GYRO_RANGE_2000DPS:
-      write8(GYRO_REGISTER_CTRL_REG4, 0x20);
-      break;
+  switch (_range) {
+  case GYRO_RANGE_250DPS:
+    write8(GYRO_REGISTER_CTRL_REG4, 0x00);
+    break;
+  case GYRO_RANGE_500DPS:
+    write8(GYRO_REGISTER_CTRL_REG4, 0x10);
+    break;
+  case GYRO_RANGE_2000DPS:
+    write8(GYRO_REGISTER_CTRL_REG4, 0x20);
+    break;
   }
   /* ------------------------------------------------------------------ */
 
@@ -234,8 +240,7 @@ bool Adafruit_L3GD20_Unified::begin(gyroRange_t rng, TwoWire *theWire)
     @param  enabled Set to 'true' to enable auto-ranging, 'false' to disable.
 */
 /**************************************************************************/
-void Adafruit_L3GD20_Unified::enableAutoRange(bool enabled)
-{
+void Adafruit_L3GD20_Unified::enableAutoRange(bool enabled) {
   _autoRangeEnabled = enabled;
 }
 
@@ -250,8 +255,7 @@ void Adafruit_L3GD20_Unified::enableAutoRange(bool enabled)
     @return True if the event was successfully read, otherwise false.
 */
 /**************************************************************************/
-bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
-{
+bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t *event) {
   bool readingValid = false;
 
   /* Clear the event */
@@ -262,42 +266,41 @@ bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
   raw.y = 0;
   raw.z = 0;
 
-  event->version   = sizeof(sensors_event_t);
+  event->version = sizeof(sensors_event_t);
   event->sensor_id = _sensorID;
-  event->type      = SENSOR_TYPE_GYROSCOPE;
+  event->type = SENSOR_TYPE_GYROSCOPE;
 
-  while(!readingValid)
-  {
+  while (!readingValid) {
     event->timestamp = millis();
 
     /* Read 6 bytes from the sensor */
     _i2c->beginTransmission((byte)L3GD20_ADDRESS);
-    #if ARDUINO >= 100
-      _i2c->write(GYRO_REGISTER_OUT_X_L | 0x80);
-    #else
-      _i2c->send(GYRO_REGISTER_OUT_X_L | 0x80);
-    #endif
+#if ARDUINO >= 100
+    _i2c->write(GYRO_REGISTER_OUT_X_L | 0x80);
+#else
+    _i2c->send(GYRO_REGISTER_OUT_X_L | 0x80);
+#endif
     if (_i2c->endTransmission() != 0) {
-        // Error. Retry.
-        continue;
+      // Error. Retry.
+      continue;
     }
     _i2c->requestFrom((byte)L3GD20_ADDRESS, (byte)6);
 
-    #if ARDUINO >= 100
-      uint8_t xlo = _i2c->read();
-      uint8_t xhi = _i2c->read();
-      uint8_t ylo = _i2c->read();
-      uint8_t yhi = _i2c->read();
-      uint8_t zlo = _i2c->read();
-      uint8_t zhi = _i2c->read();
-    #else
-      uint8_t xlo = _i2c->receive();
-      uint8_t xhi = _i2c->receive();
-      uint8_t ylo = _i2c->receive();
-      uint8_t yhi = _i2c->receive();
-      uint8_t zlo = _i2c->receive();
-      uint8_t zhi = _i2c->receive();
-    #endif
+#if ARDUINO >= 100
+    uint8_t xlo = _i2c->read();
+    uint8_t xhi = _i2c->read();
+    uint8_t ylo = _i2c->read();
+    uint8_t yhi = _i2c->read();
+    uint8_t zlo = _i2c->read();
+    uint8_t zhi = _i2c->read();
+#else
+    uint8_t xlo = _i2c->receive();
+    uint8_t xhi = _i2c->receive();
+    uint8_t ylo = _i2c->receive();
+    uint8_t yhi = _i2c->receive();
+    uint8_t zlo = _i2c->receive();
+    uint8_t zhi = _i2c->receive();
+#endif
 
     /* Shift values to create properly formed integer (low byte first) */
     event->gyro.x = (int16_t)(xlo | (xhi << 8));
@@ -310,47 +313,40 @@ bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
     raw.z = (int16_t)(zlo | (zhi << 8));
 
     /* Make sure the sensor isn't saturating if auto-ranging is enabled */
-    if (!_autoRangeEnabled)
-    {
+    if (!_autoRangeEnabled) {
       readingValid = true;
-    }
-    else
-    {
+    } else {
       /* Check if the sensor is saturating or not */
-      if ( (event->gyro.x >= 32760) | (event->gyro.x <= -32760) |
-           (event->gyro.y >= 32760) | (event->gyro.y <= -32760) |
-           (event->gyro.z >= 32760) | (event->gyro.z <= -32760) )
-      {
+      if ((event->gyro.x >= 32760) | (event->gyro.x <= -32760) |
+          (event->gyro.y >= 32760) | (event->gyro.y <= -32760) |
+          (event->gyro.z >= 32760) | (event->gyro.z <= -32760)) {
         /* Saturating .... increase the range if we can */
-        switch(_range)
-        {
-          case GYRO_RANGE_500DPS:
-            /* Push the range up to 2000dps */
-            _range = GYRO_RANGE_2000DPS;
-            write8(GYRO_REGISTER_CTRL_REG1, 0x00);
-            write8(GYRO_REGISTER_CTRL_REG1, 0x0F);
-            write8(GYRO_REGISTER_CTRL_REG4, 0x20);
-            write8(GYRO_REGISTER_CTRL_REG5, 0x80);
-            readingValid = false;
-            // Serial.println("Changing range to 2000DPS");
-            break;
-          case GYRO_RANGE_250DPS:
-            /* Push the range up to 500dps */
-            _range = GYRO_RANGE_500DPS;
-            write8(GYRO_REGISTER_CTRL_REG1, 0x00);
-            write8(GYRO_REGISTER_CTRL_REG1, 0x0F);
-            write8(GYRO_REGISTER_CTRL_REG4, 0x10);
-            write8(GYRO_REGISTER_CTRL_REG5, 0x80);
-            readingValid = false;
-            // Serial.println("Changing range to 500DPS");
-            break;
-          default:
-            readingValid = true;
-            break;
+        switch (_range) {
+        case GYRO_RANGE_500DPS:
+          /* Push the range up to 2000dps */
+          _range = GYRO_RANGE_2000DPS;
+          write8(GYRO_REGISTER_CTRL_REG1, 0x00);
+          write8(GYRO_REGISTER_CTRL_REG1, 0x0F);
+          write8(GYRO_REGISTER_CTRL_REG4, 0x20);
+          write8(GYRO_REGISTER_CTRL_REG5, 0x80);
+          readingValid = false;
+          // Serial.println("Changing range to 2000DPS");
+          break;
+        case GYRO_RANGE_250DPS:
+          /* Push the range up to 500dps */
+          _range = GYRO_RANGE_500DPS;
+          write8(GYRO_REGISTER_CTRL_REG1, 0x00);
+          write8(GYRO_REGISTER_CTRL_REG1, 0x0F);
+          write8(GYRO_REGISTER_CTRL_REG4, 0x10);
+          write8(GYRO_REGISTER_CTRL_REG5, 0x80);
+          readingValid = false;
+          // Serial.println("Changing range to 500DPS");
+          break;
+        default:
+          readingValid = true;
+          break;
         }
-      }
-      else
-      {
+      } else {
         /* All values are withing range */
         readingValid = true;
       }
@@ -358,23 +354,22 @@ bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
   }
 
   /* Compensate values depending on the resolution */
-  switch(_range)
-  {
-    case GYRO_RANGE_250DPS:
-      event->gyro.x *= GYRO_SENSITIVITY_250DPS;
-      event->gyro.y *= GYRO_SENSITIVITY_250DPS;
-      event->gyro.z *= GYRO_SENSITIVITY_250DPS;
-      break;
-    case GYRO_RANGE_500DPS:
-      event->gyro.x *= GYRO_SENSITIVITY_500DPS;
-      event->gyro.y *= GYRO_SENSITIVITY_500DPS;
-      event->gyro.z *= GYRO_SENSITIVITY_500DPS;
-      break;
-    case GYRO_RANGE_2000DPS:
-      event->gyro.x *= GYRO_SENSITIVITY_2000DPS;
-      event->gyro.y *= GYRO_SENSITIVITY_2000DPS;
-      event->gyro.z *= GYRO_SENSITIVITY_2000DPS;
-      break;
+  switch (_range) {
+  case GYRO_RANGE_250DPS:
+    event->gyro.x *= GYRO_SENSITIVITY_250DPS;
+    event->gyro.y *= GYRO_SENSITIVITY_250DPS;
+    event->gyro.z *= GYRO_SENSITIVITY_250DPS;
+    break;
+  case GYRO_RANGE_500DPS:
+    event->gyro.x *= GYRO_SENSITIVITY_500DPS;
+    event->gyro.y *= GYRO_SENSITIVITY_500DPS;
+    event->gyro.z *= GYRO_SENSITIVITY_500DPS;
+    break;
+  case GYRO_RANGE_2000DPS:
+    event->gyro.x *= GYRO_SENSITIVITY_2000DPS;
+    event->gyro.y *= GYRO_SENSITIVITY_2000DPS;
+    event->gyro.z *= GYRO_SENSITIVITY_2000DPS;
+    break;
   }
 
   /* Convert values to rad/s */
@@ -393,25 +388,21 @@ bool Adafruit_L3GD20_Unified::getEvent(sensors_event_t* event)
                     written.
 */
 /**************************************************************************/
-void  Adafruit_L3GD20_Unified::getSensor(sensor_t* sensor)
-{
+void Adafruit_L3GD20_Unified::getSensor(sensor_t *sensor) {
   /* Clear the sensor_t object */
   memset(sensor, 0, sizeof(sensor_t));
 
   /* Insert the sensor name in the fixed length char array */
-  strncpy (sensor->name, "L3GD20", sizeof(sensor->name) - 1);
-  sensor->name[sizeof(sensor->name)- 1] = 0;
-  sensor->version     = 1;
-  sensor->sensor_id   = _sensorID;
-  sensor->type        = SENSOR_TYPE_GYROSCOPE;
-  sensor->min_delay   = 0;
-  sensor->max_value   = (float)this->_range * SENSORS_DPS_TO_RADS;
-  sensor->min_value   = (this->_range * -1.0) * SENSORS_DPS_TO_RADS;
-  sensor->resolution  = 0.0F; // TBD
+  strncpy(sensor->name, "L3GD20", sizeof(sensor->name) - 1);
+  sensor->name[sizeof(sensor->name) - 1] = 0;
+  sensor->version = 1;
+  sensor->sensor_id = _sensorID;
+  sensor->type = SENSOR_TYPE_GYROSCOPE;
+  sensor->min_delay = 0;
+  sensor->max_value = (float)this->_range * SENSORS_DPS_TO_RADS;
+  sensor->min_value = (this->_range * -1.0) * SENSORS_DPS_TO_RADS;
+  sensor->resolution = 0.0F; // TBD
 }
-
-
-
 
 /* --- The code below is no longer maintained and provided solely for */
 /* --- compatibility reasons! */
@@ -425,7 +416,8 @@ void  Adafruit_L3GD20_Unified::getSensor(sensor_t* sensor)
  ***************************************************************************/
 
 /// @private
-Adafruit_L3GD20::Adafruit_L3GD20(int8_t cs, int8_t miso, int8_t mosi, int8_t clk) {
+Adafruit_L3GD20::Adafruit_L3GD20(int8_t cs, int8_t miso, int8_t mosi,
+                                 int8_t clk) {
   _cs = cs;
   _miso = miso;
   _mosi = mosi;
@@ -439,8 +431,7 @@ Adafruit_L3GD20::Adafruit_L3GD20(void) {
 }
 
 /// @private
-bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
-{
+bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr) {
   if (_cs == -1) {
     _i2c->begin();
   } else {
@@ -457,9 +448,8 @@ bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
   /* Make sure we have the correct chip ID since this checks
      for correct address and that the IC is properly connected */
   uint8_t id = read8(GYRO_REGISTER_WHO_AM_I);
-  //Serial.println(id, HEX);
-  if ((id != L3GD20_ID) && (id != L3GD20H_ID))
-  {
+  // Serial.println(id, HEX);
+  if ((id != L3GD20_ID) && (id != L3GD20H_ID)) {
     return false;
   }
 
@@ -518,17 +508,16 @@ bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
      0  SIM       SPI Mode (0=4-wire, 1=3-wire)                       0 */
 
   /* Adjust resolution if requested */
-  switch(range)
-  {
-    case GYRO_RANGE_250DPS:
-      write8(GYRO_REGISTER_CTRL_REG4, 0x00);
-      break;
-    case GYRO_RANGE_500DPS:
-      write8(GYRO_REGISTER_CTRL_REG4, 0x10);
-      break;
-    case GYRO_RANGE_2000DPS:
-      write8(GYRO_REGISTER_CTRL_REG4, 0x20);
-      break;
+  switch (range) {
+  case GYRO_RANGE_250DPS:
+    write8(GYRO_REGISTER_CTRL_REG4, 0x00);
+    break;
+  case GYRO_RANGE_500DPS:
+    write8(GYRO_REGISTER_CTRL_REG4, 0x10);
+    break;
+  case GYRO_RANGE_2000DPS:
+    write8(GYRO_REGISTER_CTRL_REG4, 0x20);
+    break;
   }
   /* ------------------------------------------------------------------ */
 
@@ -551,9 +540,8 @@ bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
 /***************************************************************************
  PUBLIC FUNCTIONS
  ***************************************************************************/
- /// @private
-void Adafruit_L3GD20::read()
-{
+/// @private
+void Adafruit_L3GD20::read() {
   uint8_t xhi, xlo, ylo, yhi, zlo, zhi;
 
   if (_cs == -1) {
@@ -591,23 +579,22 @@ void Adafruit_L3GD20::read()
   data.z = (int16_t)(zlo | (zhi << 8));
 
   // Compensate values depending on the resolution
-  switch(range)
-  {
-    case GYRO_RANGE_250DPS:
-      data.x *= GYRO_SENSITIVITY_250DPS;
-      data.y *= GYRO_SENSITIVITY_250DPS;
-      data.z *= GYRO_SENSITIVITY_250DPS;
-      break;
-    case GYRO_RANGE_500DPS:
-      data.x *= GYRO_SENSITIVITY_500DPS;
-      data.y *= GYRO_SENSITIVITY_500DPS;
-      data.z *= GYRO_SENSITIVITY_500DPS;
-      break;
-    case GYRO_RANGE_2000DPS:
-      data.x *= GYRO_SENSITIVITY_2000DPS;
-      data.y *= GYRO_SENSITIVITY_2000DPS;
-      data.z *= GYRO_SENSITIVITY_2000DPS;
-      break;
+  switch (range) {
+  case GYRO_RANGE_250DPS:
+    data.x *= GYRO_SENSITIVITY_250DPS;
+    data.y *= GYRO_SENSITIVITY_250DPS;
+    data.z *= GYRO_SENSITIVITY_250DPS;
+    break;
+  case GYRO_RANGE_500DPS:
+    data.x *= GYRO_SENSITIVITY_500DPS;
+    data.y *= GYRO_SENSITIVITY_500DPS;
+    data.z *= GYRO_SENSITIVITY_500DPS;
+    break;
+  case GYRO_RANGE_2000DPS:
+    data.x *= GYRO_SENSITIVITY_2000DPS;
+    data.y *= GYRO_SENSITIVITY_2000DPS;
+    data.z *= GYRO_SENSITIVITY_2000DPS;
+    break;
   }
 }
 
@@ -615,8 +602,7 @@ void Adafruit_L3GD20::read()
  PRIVATE FUNCTIONS
  ***************************************************************************/
 /// @private
-void Adafruit_L3GD20::write8(l3gd20Registers_t reg, byte value)
-{
+void Adafruit_L3GD20::write8(l3gd20Registers_t reg, byte value) {
   if (_cs == -1) {
     // use i2c
     _i2c->beginTransmission(address);
@@ -635,8 +621,7 @@ void Adafruit_L3GD20::write8(l3gd20Registers_t reg, byte value)
 }
 
 /// @private
-byte Adafruit_L3GD20::read8(l3gd20Registers_t reg)
-{
+byte Adafruit_L3GD20::read8(l3gd20Registers_t reg) {
   byte value;
 
   if (_cs == -1) {
@@ -663,16 +648,16 @@ byte Adafruit_L3GD20::read8(l3gd20Registers_t reg)
 uint8_t Adafruit_L3GD20::SPIxfer(uint8_t x) {
   uint8_t value = 0;
 
-  for (int i=7; i>=0; i--) {
+  for (int i = 7; i >= 0; i--) {
     digitalWrite(_clk, LOW);
-    if (x & (1<<i)) {
+    if (x & (1 << i)) {
       digitalWrite(_mosi, HIGH);
     } else {
       digitalWrite(_mosi, LOW);
-      }
+    }
     digitalWrite(_clk, HIGH);
     if (digitalRead(_miso))
-      value |= (1<<i);
+      value |= (1 << i);
   }
 
   return value;
